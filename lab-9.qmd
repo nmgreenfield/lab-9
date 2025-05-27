@@ -1,0 +1,156 @@
+---
+title: "Art"
+format: html
+editor: visual
+embed-resources: true
+---
+
+```{r}
+#| label: packages
+#| include: false
+
+library(tidyverse)
+library(ggplot2)
+library(tibble)
+library(rayshader)
+library(ambient)
+library(ggthemes)
+library(grDevices)
+library(magick)
+```
+
+
+
+# NOT LAB?
+
+
+```{r}
+polar_art <- function(seed, n, palette) {
+  
+  # set the state of the random number generator
+  set.seed(seed)
+  
+  # data frame containing random values for 
+  # aesthetics we might want to use in the art
+  dat <- tibble(
+    x0 = runif(n),
+    y0 = runif(n),
+    x1 = x0 + runif(n, min = -.2, max = .2),
+    y1 = y0 + runif(n, min = -.2, max = .2),
+    shade = runif(n), 
+    size = runif(n)
+  )
+  
+  # plot segments in various colours, using 
+  # polar coordinates and a gradient palette
+  dat |> 
+    ggplot(aes(
+      x = x0,
+      y = y0,
+      xend = x1,
+      yend = y1,
+      colour = shade,
+      linewidth = size
+    )) +
+    geom_segment(show.legend = FALSE) +
+    coord_polar() +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(expand = c(0, 0)) + 
+    scale_colour_gradientn(colours = palette) + 
+    scale_size(range = c(0, 10)) + 
+    theme_void()
+}
+```
+
+```{r}
+polar_art(seed = 1, n = 500, palette = c("antiquewhite", "orange", "bisque"))
+polar_art(seed = 1, n = 500, palette = c("red", "black", "white"))
+polar_art(seed = 2, n = 50, palette = c("red", "black", "white"))
+```
+
+```{r}
+sample_canva <- function(seed = NULL) {
+  if(!is.null(seed)) set.seed(seed)
+  sample(ggthemes::canva_palettes, 1)[[1]]
+}
+```
+
+```{r}
+polar_art(seed = 2, n = 100, palette = sample_canva(seed = 2))
+polar_art(seed = 2, n = 100, palette = sample_canva(seed = 3))
+polar_art(seed = 2, n = 100, palette = sample_canva(seed = 4))
+```
+
+
+# Art 1
+
+
+
+# Art 2
+
+## Functions
+
+```{r}
+# Random palette - returns hex values
+sample_lava_palette <- function(n = 256) {
+  hues <- sort(runif(n))
+  sats <- runif(n, 0.7, 1) #saturation
+  vals <- runif(n, 0.8, 1) #brightness
+  hsv(hues, sats, vals)
+}
+
+# Single frame generator with time offset
+lava_frame <- function(frame, pixels = 500) {
+  z_offset <- frame / 100  # change speed of animation - divide by larger # to slow
+  
+  # create grid of pixels
+  grid <- long_grid(
+    x = seq(0, 1, length.out = pixels),
+    y = seq(0, 1, length.out = pixels)
+  ) |>
+    mutate(
+      paint = fracture(
+        x = x,
+        y = y,
+        z = z_offset,
+        noise = gen_simplex, # simplex noise generator to look like lava lamp
+        fractal = fbm, # fractal Brownian motion
+        octaves = 1, # can't notice changes when adjusting
+        frequency = 3 # changes number of blobs, want to keep low
+      ),
+      paint = normalise(paint)
+    ) |>
+    as.array(value = paint)
+  
+  # generates color palette
+  lava_palette <- sample_lava_palette(256)
+  
+  # apply shading
+  img <- height_shade(grid, texture = lava_palette)
+  
+  image_read(img)
+}
+
+#gif function
+make_lava_gif <- function(frames = 40, pixels = 400, fps = 2) {
+  
+  # check that fps is a factor of 100 (needed for function)
+  if (100 %% fps != 0){
+    stop("fps must be a factor of 100")
+  }
+  
+  # animates frames
+  images <- map(1:frames, ~ lava_frame(.x, pixels = pixels))
+  animation <- image_animate(image_join(images), fps = fps)
+  
+  return(animation)
+}
+```
+
+## Plot
+
+```{r}
+gif_animation <- make_lava_gif()
+gif_animation
+```
+
