@@ -1,5 +1,5 @@
 ---
-title: "Art"
+title: "Art Gallery"
 format: html
 editor: visual
 embed-resources: true
@@ -91,10 +91,13 @@ polar_art_dual(
 
 ```
 
-*Title:* Fragmented Orbit
+**Title:** *Fragmented Orbit*
 
-*Museum-style Description:*
+**Museum-style Description:**
 In Fragmented Orbit, the artist explores the delicate tension between order and disarray. Using programmatic motion and layered forms, the piece traces the outline of a circle—traditionally a symbol of unity—only to disrupt it with sharp, scattered bars of warm and dark tones. The interplay of deep maroons and bright amber suggests an atmospheric transition, like a sunrise through fractured glass. It evokes a moment caught between movement and stillness, precision and spontaneity—a quiet chaos rendered in digital form.
+
+**Code:**
+The plot is made by generating a bunch of lines and assigning them to either top or bottom based on the angles. The two sets of lines will be colored differently. The main parameters that can be adjusted are the sample size (n), and the two color palettes. Increasing the sample size will increase the number of lines, which makes the plot look more dense. The palettes for both the bottom and top lines can be adjusted to customize the colors. 
 
 
 # Art 2
@@ -143,7 +146,7 @@ lava_frame <- function(frame, pixels = 400, speed = 100, freq = 3) {
 }
 
 #gif function
-make_lava_gif <- function(frames = 40, fps = 2, speed = 100, freq = 3) {
+make_lava_gif <- function(frames = 40, fps = 1, speed = 100, freq = 3) {
   
   # check that fps is a factor of 100 (needed for function)
   if (100 %% fps != 0){
@@ -165,7 +168,10 @@ gif_animation <- make_lava_gif()
 gif_animation
 ```
 
-*Title:* Viscous Drift
+**Title:** *Viscous Drift*
 
-*Museum-style Description:*
+**Museum-style Description:**
 Viscous Drift simulates the hypnotic undulations of a lava lamp—an homage to the liquid logic of motion and color. This work doesn’t just depict fluidity; it breathes it. Concentric waves of saturated hues ripple across the canvas, colliding and melting into each other with a dreamlike softness. There's no fixed center, no clear beginning—just a perpetual unfolding. The color palette, both synthetic and organic, pulls the viewer into a trance of perpetual transformation, evoking the slow-motion chaos of something alive yet utterly abstract.
+
+**Code:**
+The plot is made by using `fracture()`. Setting the `noise` parameter to *gen_simplex* makes the plot look like a lava lamp. There are three main parameters that can be adjusted to change the image - fps, speed, and freq. Speed changes the amount of movement in the lava lamp, with lower values being more jumpy. The freq parameter makes the blobs larger for smaller values (in reality, it just zooms out and makes things look smaller for higher values). Finally, the fps adjust the numer of frames per second in the gif. Smaller values are better for a more authentic lava lamp look. 
